@@ -1,0 +1,7 @@
+---
+- name: restart cncf-distribution
+  become: true
+  systemd:
+    daemon_reload: true
+    name: cncf-distribution
+    state: restarted

@@ -1,0 +1,15 @@
+cncf_distribution_version: 2.8.1
+cncf_distribution_config:
+  storage:
+    filesystem:
+      rootdirectory: /var/lib/registry
+  http:
+    addr: 0.0.0.0:5000
+    secret: asecretforlocaldevelopment
+    debug:
+      addr: 0.0.0.0:5001
+      prometheus:
+        enabled: true
+        path: /metrics
+  proxy:
+    remoteurl: https://registry-1.docker.io

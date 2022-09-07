@@ -1,0 +1,54 @@
+- name: Download cncf distribution binary
+  get_url:
+    url: https://github.com/distribution/distribution/releases/download/v{{ cncf_distribution_version }}/registry_{{ cncf_distribution_version }}_linux_amd64.tar.gz
+    dest: /tmp
+    owner: root
+    group: root
+    mode: 0755
+    force: true
+
+- name: "Create temporary directory"
+  file:
+    path: /tmp/cncf_distribution_{{ cncf_distribution_version }}
+    state: directory
+
+- name: "Unarchive cncf-distribution files"
+  unarchive:
+    src: "/tmp/registry_{{ cncf_distribution_version }}_linux_amd64.tar.gz"
+    remote_src: true
+    dest: "/tmp/cncf_distribution_{{ cncf_distribution_version }}"
+    creates: "/tmp/cncf_distribution_{{ cncf_distribution_version }}/registry"
+
+- name: copy cncf-distribution binary
+  copy:
+    src: "/tmp/cncf_distribution_{{ cncf_distribution_version }}/registry"
+    dest: "/usr/local/bin/cncf-distribution"
+    mode: 0755
+    remote_src: true
+  notify:
+    - restart cncf-distribution
+
+- name: Create local storage directory if needed
+  file:
+    path: "{{ cncf_distribution_config.storage.filesystem.rootdirectory }}"
+    state: directory
+  when:
+    - cncf_distribution_config.storage.filesystem.rootdirectory
+
+- name: Generate config
+  template:
+    src: "cncf-distribution.yaml.j2"
+    dest: "/etc/cncf-distribution.yaml"
+    owner: root
+    group: root
+    mode: 0600
+  notify: restart cncf-distribution
+
+- name: Copy service file
+  template:
+    src: "cncf-distribution.service.j2"
+    dest: "/etc/systemd/system/cncf-distribution.service"
+    owner: root
+    group: root
+    mode: 0600
+  notify: restart cncf-distribution

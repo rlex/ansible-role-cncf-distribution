@@ -1,0 +1,11 @@
+[Unit]
+Description=CNCF distribution registry
+
+[Service]
+Type=simple
+Restart=always
+RestartSec=5s
+ExecStart=/usr/local/bin/cncf-distribution serve /etc/cncf-distribution.yaml
+
+[Install]
+WantedBy=multi-user.target
